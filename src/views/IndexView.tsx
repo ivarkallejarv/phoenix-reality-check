@@ -56,6 +56,18 @@ export const styles = StyleSheet.create({
     paddingLeft: 45,
     paddingRight: 45,
   },
+  scrollContainer: {
+    flex: 1,
+    backgroundColor: '#222222',
+    paddingTop: 100,
+    paddingBottom: 40,
+    paddingLeft: 45,
+    paddingRight: 45,
+  },
+  scrollBody: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   title: {
     color: '#fff',
     fontSize: 48,

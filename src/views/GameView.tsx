@@ -16,7 +16,6 @@ export const GameView = observer(() => {
   switch (game.status) {
     case GameEvent.START:
     case GameEvent.QUESTION:
-    case GameEvent.ROUND_END:
       return (
         <View style={styles.container}>
           <Text style={styles.title}>{game.question}</Text>
@@ -37,16 +36,29 @@ export const GameView = observer(() => {
       )
     case GameEvent.END:
       return (
-        <ScrollView style={styles.container}>
-          <Text style={styles.title}>Results</Text>
-          {game.answerList &&
-            game.answerList.map(({ clientId, question }, index) => (
-              <View key={`Answer-${index}`}>
-                <Text style={styles.body}>{question}</Text>
-                <Text style={styles.body}>{getClientName(clientId)}</Text>
-              </View>
-            ))}
+        <ScrollView style={styles.scrollContainer}>
+          <View style={styles.scrollBody}>
+            <Text style={styles.title}>Results</Text>
+            {game.answerList &&
+              game.answerList.map(({ clientId, question }, index) => (
+                <View key={`Answer-${index}`}>
+                  <Text style={styles.body}>{question}</Text>
+                  <Text style={styles.body}>{getClientName(clientId)}</Text>
+                </View>
+              ))}
+            {isVIP && (
+              <TouchableOpacity onPress={StartGame} style={styles.button}>
+                <Text style={styles.buttonText}>Restart Game</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </ScrollView>
+      )
+    case GameEvent.ROUND_END:
+      return (
+        <View style={styles.container}>
+          <Text style={styles.title}>Round has ended, please wait for next round</Text>
+        </View>
       )
     default:
       return (
