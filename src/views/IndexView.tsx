@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { observer } from 'mobx-react'
 import { BarCodeScanner } from 'expo-barcode-scanner'
-import { Button, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { rootStore } from '../stores/Rootstore'
 import { Actions } from 'react-native-router-flux'
 import { RouteNames } from '../../GlobalEnums'
@@ -19,32 +19,77 @@ export const IndexView = observer(() => {
     }
   }
 
-  if (!hasCameraPermission) {
-    return (
-      <View style={styles.container}>
-        <Text>To connect to a game, we need permission to use the camera</Text>
-        <Button title="Allow Camera for this app" onPress={requestCameraPermission} />
-      </View>
-    )
-  }
-
   if (displayBarCodeScanner) {
     return <BarCodeScanner onBarCodeScanned={scannedQRCode} style={StyleSheet.absoluteFillObject} />
   }
 
   return (
     <View style={styles.container}>
-      <Text>To connect to a game, scan QR code from the host.</Text>
-      <Button title="Scan QR Code" onPress={() => setBarCodeScanner(true)} />
+      <Text style={styles.title}>Reality Check</Text>
+      {hasCameraPermission ? (
+        <>
+          <Text style={styles.body}>To connect to a game, scan QR code from the host.</Text>
+          <TouchableOpacity onPress={() => setBarCodeScanner(true)} style={styles.button}>
+            <Text style={styles.buttonText}>Scan QR Code</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <>
+          <Text style={styles.body}>To connect to a game, we need permission to use the camera</Text>
+          <TouchableOpacity onPress={requestCameraPermission} style={styles.button}>
+            <Text style={styles.buttonText}>Allow Camera for this app</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   )
 })
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#222222',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 100,
+    paddingBottom: 40,
+    paddingLeft: 45,
+    paddingRight: 45,
+  },
+  title: {
+    color: '#fff',
+    fontSize: 48,
+  },
+  subHeading: {
+    color: '#fff',
+    fontSize: 36,
+  },
+  body: {
+    color: '#fff',
+    fontSize: 24,
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#BFA936',
+    borderRadius: 8,
+    width: 330,
+    height: 60,
+  },
+  buttonText: {
+    flex: 1,
+    color: '#fff',
+    fontSize: 20,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
+  input: {
+    height: 60,
+    width: 330,
+    borderColor: '#fff',
+    borderWidth: 2,
+    borderRadius: 8,
+    padding: 20,
+    color: '#fff',
+    fontSize: 24,
   },
 })

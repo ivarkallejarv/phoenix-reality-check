@@ -20,7 +20,7 @@ export default function App() {
     <Router>
       <Stack key="root">
         {Object.values(ROUTES).map(({ pattern, component, title }) => (
-          <Scene key={pattern} component={component} title={title} />
+          <Scene key={pattern} component={component} title={title} hideNavBar={true} />
         ))}
       </Stack>
     </Router>

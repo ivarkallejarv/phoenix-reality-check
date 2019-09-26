@@ -62,10 +62,21 @@ export class RootStore {
         this.game.playerList = value
         break
       case GameEvent.QUESTION:
+        if (value === String) {
+          this.game.target = value
+          break
+        }
+
         const { players, question, to } = value
         this.game.playerList = players
         this.game.question = question
-        this.game.target = to
+
+        let user = { name: 'Unknown' }
+        if (this.game.playerList) {
+          user = this.game.playerList.find(({ clientId }) => clientId === to)
+        }
+
+        this.game.target = user.name
         break
       case GameEvent.ROUND_END:
         this.game.answer = value

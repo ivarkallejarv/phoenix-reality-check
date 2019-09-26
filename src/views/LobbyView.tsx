@@ -1,13 +1,14 @@
 import React, { useState } from 'react'
 import { observer } from 'mobx-react'
-import { Button, StyleSheet, Text, TextInput, View } from 'react-native'
+import { Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { rootStore } from '../stores/Rootstore'
 import { Actions } from 'react-native-router-flux'
 import { RouteNames } from '../../GlobalEnums'
+import { styles } from './IndexView'
 
 export const LobbyView = observer(() => {
   const [name, setName] = useState('')
-  const { channelID, setUserName } = rootStore
+  const { setUserName } = rootStore
 
   const JoinGame = () => {
     setUserName(name || 'Anonymous')
@@ -16,22 +17,11 @@ export const LobbyView = observer(() => {
 
   return (
     <View style={styles.container}>
-      <Text>Joining channel with ID: {channelID}</Text>
-      <TextInput
-        style={{ height: 40, width: 200, borderColor: 'gray', borderWidth: 1 }}
-        value={name}
-        onChangeText={(text) => setName(text)}
-      />
-      <Button title="Join Game" onPress={JoinGame} />
+      <Text style={styles.subHeading}>Enter your name to join the game</Text>
+      <TextInput style={styles.input} value={name} onChangeText={(text) => setName(text)} />
+      <TouchableOpacity onPress={JoinGame} style={styles.button}>
+        <Text style={styles.buttonText}>Join Game</Text>
+      </TouchableOpacity>
     </View>
   )
-})
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
 })
