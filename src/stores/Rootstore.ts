@@ -1,15 +1,7 @@
 import { action, observable, reaction } from 'mobx'
 import { CameraStore } from './CameraStore'
 import Pubnub from 'pubnub'
-import {
-  Answer,
-  Client,
-  ClientAnswerMessage,
-  ClientEvent,
-  ClientHelloMessage,
-  GameEvent,
-  Message,
-} from '../../ApiTypes'
+import { Answer, ClientAnswerMessage, ClientEvent, ClientHelloMessage, GameEvent, Message } from '../../ApiTypes'
 
 export interface Player {
   clientId: string
