@@ -11,7 +11,7 @@ export const IndexView = observer(() => {
   const { cameraStore, setChannelID } = rootStore
   const { hasCameraPermission, requestCameraPermission } = cameraStore
 
-  const scannedQRCode = ({ data }) => {
+  const scannedQRCode = ({ data }: { data: string }) => {
     if (displayBarCodeScanner) {
       setChannelID(data)
       setBarCodeScanner(false)
@@ -58,11 +58,13 @@ export const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
+    flexGrow: 1,
     backgroundColor: '#222222',
     paddingTop: 100,
-    paddingBottom: 40,
-    paddingLeft: 45,
-    paddingRight: 45,
+    paddingBottom: 20,
+    paddingLeft: 25,
+    paddingRight: 25,
+    marginBottom: 20,
   },
   scrollBody: {
     alignItems: 'center',

@@ -4,14 +4,38 @@ import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { rootStore } from '../stores/Rootstore'
 import { ClientEvent, GameEvent } from '../../ApiTypes'
 import { styles } from './IndexView'
+import { Actions } from 'react-native-router-flux'
+import { RouteNames } from '../../GlobalEnums'
 
 export const GameView = observer(() => {
   const { userName, game, UUID: sender, sendMessage } = rootStore
   const isVIP = game.playerList && game.playerList.find(({ clientId, vip }) => clientId === sender && vip)
+  const playerInList = game.playerList && game.playerList.find(({ clientId }) => clientId === sender)
 
-  const SendAnswer = (clientId) => () =>
+  const GoToIndex = () => Actions.replace(RouteNames.CONNECT)
+  const SendAnswer = (clientId: string) => () =>
     sendMessage({ sender, content: { type: ClientEvent.ANSWER, value: { clientId } } })
   const StartGame = () => sendMessage({ sender, content: { type: ClientEvent.START_GAME } })
+
+  const renderResults = () => {
+    if (!game.answerList) {
+      return <Text>No results</Text>
+    }
+
+    for (const [name, values] of game.answerList) {
+      return (
+        <View>
+          <Text>Results for player => {name}</Text>
+
+          {values.map(({ question }, index) => (
+            <View key={`Answer-${index}`}>
+              <Text style={styles.body}>{question}</Text>
+            </View>
+          ))}
+        </View>
+      )
+    }
+  }
 
   switch (game.status) {
     case GameEvent.START:
@@ -39,18 +63,15 @@ export const GameView = observer(() => {
         <ScrollView style={styles.scrollContainer}>
           <View style={styles.scrollBody}>
             <Text style={styles.title}>Results</Text>
-            {game.answerList &&
-              game.answerList.map(({ question, name }, index) => (
-                <View key={`Answer-${index}`}>
-                  <Text style={styles.body}>{question}</Text>
-                  <Text style={styles.body}>{name}</Text>
-                </View>
-              ))}
+            {renderResults()}
             {isVIP && (
               <TouchableOpacity onPress={StartGame} style={styles.button}>
                 <Text style={styles.buttonText}>Restart Game</Text>
               </TouchableOpacity>
             )}
+            <TouchableOpacity onPress={GoToIndex} style={styles.button}>
+              <Text style={styles.buttonText}>Go To Index Page</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
       )
@@ -61,10 +82,13 @@ export const GameView = observer(() => {
         </View>
       )
     case GameEvent.CLIENT_LEFT:
-    case GameEvent.CLIENT_JOINED:
       return (
         <View style={styles.container}>
-          <Text style={styles.title}>A player has left and/or joined</Text>
+          <Text style={styles.title}>A player has left/been kicked</Text>
+          {!playerInList && <Text style={styles.body}>You've been kicked</Text>}
+          <TouchableOpacity onPress={GoToIndex} style={styles.button}>
+            <Text style={styles.buttonText}>Go To Index Page</Text>
+          </TouchableOpacity>
         </View>
       )
     default:

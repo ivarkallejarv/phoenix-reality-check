@@ -15,7 +15,7 @@ export interface GameType {
   question: string
   target: string
   answer: Answer
-  answerList: Answer[]
+  answerList: Map<string, Answer[]>
 }
 
 const publishKey = 'pub-c-bd289ae2-d65d-4100-8ddd-a514558bbf7a'
@@ -30,16 +30,16 @@ export class RootStore {
   @observable PubNubInstance = new Pubnub({ publishKey, subscribeKey, uuid: this.UUID })
 
   @observable game: GameType = {
-    status: null,
+    status: GameEvent.TEST,
     playerList: [],
     question: '',
     target: '',
-    answer: null,
-    answerList: [],
+    answer: { name: '', clientId: '', question: '' },
+    answerList: new Map([]),
   }
 
-  @action setChannelID = (value) => (this.channelID = value)
-  @action setUserName = (value) => {
+  @action setChannelID = (value: string) => (this.channelID = value)
+  @action setUserName = (value: string) => {
     this.userName = value
     this.sendMessage({ sender: this.UUID, content: { type: ClientEvent.HELLO, value: this.userName } })
   }
@@ -58,7 +58,25 @@ export class RootStore {
     })
   }
 
-  handleMessage = ({ content }) => {
+  groupBy = (list: Answer[], keyGetter: (player: Answer) => string) => {
+    const map = new Map()
+    list.forEach((item) => {
+      const key = keyGetter(item)
+      const collection = map.get(key)
+      if (!collection) {
+        map.set(key, [item])
+      } else {
+        collection.push(item)
+      }
+    })
+    return map
+  }
+
+  groupAnswerList = (list: Answer[]) => {
+    return this.groupBy(list, (player) => player.name)
+  }
+
+  handleMessage = ({ content }: { content: { type: GameEvent; value: any } }) => {
     const { type, value } = content
     this.game.status = type
     switch (type) {
@@ -79,7 +97,7 @@ export class RootStore {
 
         let user = { name: 'Unknown' }
         if (this.game.playerList) {
-          user = this.game.playerList.find(({ clientId }) => clientId === to)
+          user = this.game.playerList.find(({ clientId }) => clientId === to) || { name: 'Unknown' }
         }
 
         this.game.target = user.name
@@ -88,7 +106,7 @@ export class RootStore {
         this.game.answer = value
         break
       case GameEvent.END:
-        this.game.answerList = value
+        this.game.answerList = this.groupAnswerList(value)
         break
       default:
         console.log('Different kind of event => ', type, value)
