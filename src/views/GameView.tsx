@@ -6,7 +6,7 @@ import { ClientEvent, GameEvent } from '../../ApiTypes'
 import { styles } from './IndexView'
 
 export const GameView = observer(() => {
-  const { userName, game, UUID: sender, sendMessage, getClientName } = rootStore
+  const { userName, game, UUID: sender, sendMessage } = rootStore
   const isVIP = game.playerList && game.playerList.find(({ clientId, vip }) => clientId === sender && vip)
 
   const SendAnswer = (clientId) => () =>
@@ -40,10 +40,10 @@ export const GameView = observer(() => {
           <View style={styles.scrollBody}>
             <Text style={styles.title}>Results</Text>
             {game.answerList &&
-              game.answerList.map(({ clientId, question }, index) => (
+              game.answerList.map(({ question, name }, index) => (
                 <View key={`Answer-${index}`}>
                   <Text style={styles.body}>{question}</Text>
-                  <Text style={styles.body}>{getClientName(clientId)}</Text>
+                  <Text style={styles.body}>{name}</Text>
                 </View>
               ))}
             {isVIP && (
@@ -58,6 +58,13 @@ export const GameView = observer(() => {
       return (
         <View style={styles.container}>
           <Text style={styles.title}>Round has ended, please wait for next round</Text>
+        </View>
+      )
+    case GameEvent.CLIENT_LEFT:
+    case GameEvent.CLIENT_JOINED:
+      return (
+        <View style={styles.container}>
+          <Text style={styles.title}>A player has left and/or joined</Text>
         </View>
       )
     default:

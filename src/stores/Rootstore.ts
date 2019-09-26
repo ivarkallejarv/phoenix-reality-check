@@ -104,14 +104,6 @@ export class RootStore {
   ) => {
     this.PubNubInstance.publish({ message, channel: this.channelID }, () => {})
   }
-
-  getClientName = (ID: string) => {
-    if (this.game.playerList && ID) {
-      const { name } = this.game.playerList.find(({ clientId }) => clientId === ID)
-      return name
-    }
-    return 'No name found'
-  }
 }
 
 export const rootStore = new RootStore()

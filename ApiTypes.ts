@@ -58,6 +58,7 @@ export interface Client {
 }
 
 export interface Answer {
+  name: string
   clientId: string
   question: string
 }
