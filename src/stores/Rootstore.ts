@@ -1,11 +1,25 @@
 import { action, observable, reaction } from 'mobx'
 import { CameraStore } from './CameraStore'
 import Pubnub from 'pubnub'
-import { Answer, ClientAnswerMessage, ClientEvent, ClientHelloMessage, GameEvent, Message } from '../../ApiTypes'
+import {
+  Answer,
+  Client,
+  ClientAnswerMessage,
+  ClientEvent,
+  ClientHelloMessage,
+  GameEvent,
+  Message,
+} from '../../ApiTypes'
+
+export interface Player {
+  clientId: string
+  name: string
+  vip: boolean
+}
 
 export interface GameType {
   status: GameEvent
-  playerList: { clientId: string; name: string; vip: boolean }[]
+  playerList: Player[]
   question: string
   target: string
   answer: Answer
@@ -90,8 +104,21 @@ export class RootStore {
     }
   }
 
-  sendMessage = (message: Message<ClientHelloMessage> | Message<ClientAnswerMessage>) => {
+  sendMessage = (
+    message:
+      | Message<ClientHelloMessage>
+      | Message<ClientAnswerMessage>
+      | { sender: string; content: { type: ClientEvent } },
+  ) => {
     this.PubNubInstance.publish({ message, channel: this.channelID }, () => {})
+  }
+
+  getClientName = (ID: string) => {
+    if (this.game.playerList && ID) {
+      const { name } = this.game.playerList.find(({ clientId }) => clientId === ID)
+      return name
+    }
+    return 'No name found'
   }
 }
 

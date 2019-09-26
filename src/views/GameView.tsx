@@ -1,27 +1,22 @@
 import React from 'react'
 import { observer } from 'mobx-react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import { rootStore } from '../stores/Rootstore'
 import { ClientEvent, GameEvent } from '../../ApiTypes'
 import { styles } from './IndexView'
 
 export const GameView = observer(() => {
-  const { userName, game, UUID, sendMessage } = rootStore
+  const { userName, game, UUID: sender, sendMessage, getClientName } = rootStore
+  const isVIP = game.playerList && game.playerList.find(({ clientId, vip }) => clientId === sender && vip)
 
-  const getClientName = (ID) => {
-    if (game.playerList && ID) {
-      const { name } = game.playerList.find(({ clientId }) => clientId === ID)
-      return name
-    }
-    return 'No name found'
-  }
-
-  const sendAnswer = (clientId) => () => {
-    sendMessage({ sender: UUID, content: { type: ClientEvent.ANSWER, value: { clientId } } })
-  }
+  const SendAnswer = (clientId) => () =>
+    sendMessage({ sender, content: { type: ClientEvent.ANSWER, value: { clientId } } })
+  const StartGame = () => sendMessage({ sender, content: { type: ClientEvent.START_GAME } })
 
   switch (game.status) {
+    case GameEvent.START:
     case GameEvent.QUESTION:
+    case GameEvent.ROUND_END:
       return (
         <View style={styles.container}>
           <Text style={styles.title}>{game.question}</Text>
@@ -30,7 +25,7 @@ export const GameView = observer(() => {
             <>
               {game.playerList &&
                 game.playerList.map(({ clientId, name, vip }, index) => (
-                  <TouchableOpacity key={`player-${index}`} onPress={sendAnswer(clientId)} style={styles.button}>
+                  <TouchableOpacity key={`player-${index}`} onPress={SendAnswer(clientId)} style={styles.button}>
                     <Text style={styles.buttonText}>{name}</Text>
                   </TouchableOpacity>
                 ))}
@@ -40,16 +35,9 @@ export const GameView = observer(() => {
           )}
         </View>
       )
-    case GameEvent.ROUND_END:
-      return (
-        <View style={styles.container}>
-          <Text style={styles.body}>Question that was answered {game.answer && game.answer.question}</Text>
-          <Text style={styles.body}>Answer {game.answer && getClientName(game.answer.clientId)}</Text>
-        </View>
-      )
     case GameEvent.END:
       return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
           <Text style={styles.title}>Results</Text>
           {game.answerList &&
             game.answerList.map(({ clientId, question }, index) => (
@@ -58,7 +46,7 @@ export const GameView = observer(() => {
                 <Text style={styles.body}>{getClientName(clientId)}</Text>
               </View>
             ))}
-        </View>
+        </ScrollView>
       )
     default:
       return (
@@ -75,6 +63,12 @@ export const GameView = observer(() => {
                 </Text>
               ))}
           </View>
+
+          {isVIP && (
+            <TouchableOpacity onPress={StartGame} style={styles.button}>
+              <Text style={styles.buttonText}>Start Game</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )
   }

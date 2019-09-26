@@ -59,15 +59,18 @@ export const styles = StyleSheet.create({
   title: {
     color: '#fff',
     fontSize: 48,
+    fontFamily: 'rounded-mplus',
   },
   subHeading: {
     color: '#fff',
     fontSize: 36,
+    fontFamily: 'rounded-mplus',
   },
   body: {
     color: '#fff',
     fontSize: 24,
     textAlign: 'center',
+    fontFamily: 'rounded-mplus',
   },
   button: {
     backgroundColor: '#BFA936',
@@ -81,6 +84,7 @@ export const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     textAlignVertical: 'center',
+    fontFamily: 'rounded-mplus',
   },
   input: {
     height: 60,
@@ -88,7 +92,7 @@ export const styles = StyleSheet.create({
     borderColor: '#fff',
     borderWidth: 2,
     borderRadius: 8,
-    padding: 20,
+    padding: 15,
     color: '#fff',
     fontSize: 24,
   },
